@@ -14,6 +14,5 @@ class Room:
     def from_dict(cls, init_dict: dict) -> "Room":
         return cls(**init_dict)
 
-    @classmethod
-    def to_dict(cls, room: "Room") -> dict:
-        return dataclasses.asdict(room)
+    def to_dict(self) -> dict:
+        return dataclasses.asdict(self)

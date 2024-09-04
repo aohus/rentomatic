@@ -4,6 +4,8 @@ from unittest import mock
 import pytest
 
 from rentomatic.domain.room import Room
+from rentomatic.requests.room_list import build_room_list_request
+from rentomatic.responses import ResponseTypes
 from rentomatic.use_cases.room_list import room_list_use_case
 
 
@@ -48,7 +50,39 @@ def test_room_list_without_parameters(domain_rooms):
     repo = mock.Mock()
     repo.list.return_value = domain_rooms
 
-    result = room_list_use_case(repo)
+    request = build_room_list_request()
 
-    repo.list.assert_called_with()
-    assert result == domain_rooms
+    response = room_list_use_case(repo, request)
+
+    assert bool(response) is True
+    repo.list.assert_called_with(filters=None)
+    assert response.value == domain_rooms
+
+
+def test_room_list_with_filters(domain_rooms):
+    repo = mock.Mock()
+    repo.list.return_value = domain_rooms
+
+    qry_filters = {"code__eq": 5}
+    request = build_room_list_request(filters=qry_filters)
+
+    response = room_list_use_case(repo, request)
+
+    assert bool(response) is True
+    repo.list.assert_called_with(filters=qry_filters)
+    assert response.value == domain_rooms
+
+
+def test_room_list_handles_generic_error():
+    repo = mock.Mock()
+    repo.list.side_effect = Exception("Just an error message")
+
+    request = build_room_list_request(filters={})
+
+    response = room_list_use_case(repo, request)
+
+    assert bool(response) is False
+    assert response.value == {
+        "type": ResponseTypes.SYSTEM_ERROR,
+        "message": "Exception: Just an error message",
+    }
