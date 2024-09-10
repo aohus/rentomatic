@@ -1,7 +1,7 @@
 from rentomatic.domain.room import Room
+from rentomatic.repository.repo import Repository
 
-
-class MemRepo:
+class MemRepo(Repository):
     def __init__(self, data):
         self.data = data
 

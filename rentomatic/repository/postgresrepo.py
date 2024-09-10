@@ -3,9 +3,10 @@ from sqlalchemy.orm import sessionmaker
 
 from rentomatic.domain import room
 from rentomatic.repository.postgres_objects import Base, Room
+from rentomatic.repository.repo import Repository
 
 
-class PostgresRepo:
+class PostgresRepo(Repository):
     def __init__(self, configuration):
         connection_string = "postgresql+psycopg2://{}:{}@{}:{}/{}".format(
             configuration["POSTGRES_USER"],
